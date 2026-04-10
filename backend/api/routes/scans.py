@@ -8,6 +8,9 @@ import uuid
 from db.database import get_db
 from db.models import Scan, ScanStatus
 
+from fastapi import BackgroundTasks
+from core.pipeline import run_pipeline
+
 router = APIRouter()
 
 
@@ -57,7 +60,7 @@ def scan_to_response(scan: Scan) -> ScanResponse:
 
 
 @router.post("/", response_model=ScanResponse, status_code=201)
-def create_scan(payload: ScanCreate, db: Session = Depends(get_db)):
+async def create_scan(payload: ScanCreate, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
     scan = Scan(
         id=str(uuid.uuid4()),
         target_url=payload.target_url,
@@ -71,13 +74,16 @@ def create_scan(payload: ScanCreate, db: Session = Depends(get_db)):
     db.add(scan)
     db.commit()
     db.refresh(scan)
+
+    background_tasks.add_task(run_pipeline, scan.id, payload.api_key)
+
     return scan_to_response(scan)
 
 
 @router.get("/", response_model=List[ScanResponse])
 def list_scans(db: Session = Depends(get_db)):
-    scans = db.query(Scan).order_by(Scan.created_at.desc()).all()
-    return [scan_to_response(scan) for scan in scans]
+    db.expire_all()
+    return [scan_to_response(scan) for scan in db.query(Scan).order_by(Scan.created_at.desc()).all()]
 
 
 @router.get("/{scan_id}", response_model=ScanResponse)
