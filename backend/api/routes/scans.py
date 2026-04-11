@@ -1,12 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 from datetime import datetime
 import uuid
 
 from db.database import get_db
-from db.models import Scan, ScanStatus
+from db.models import Scan, Attack, ScanStatus
 
 from fastapi import BackgroundTasks
 from core.pipeline import run_pipeline
@@ -31,6 +31,23 @@ class ScanResponse(BaseModel):
     status: str
     created_at: datetime
     updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class AttackResponse(BaseModel):
+    id: int
+    scan_id: str
+    template_id: str
+    category: str
+    payload: str
+    response: Optional[str]
+    success: Optional[str]
+    severity: Optional[str]
+    judge_reasoning: Optional[str]
+    score: Optional[float]
+    created_at: datetime
 
     class Config:
         from_attributes = True
@@ -101,3 +118,10 @@ def delete_scan(scan_id: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Scan not found")
     db.delete(scan)
     db.commit()
+
+@router.get("/{scan_id}/attacks", response_model=List[AttackResponse])
+def get_attacks(scan_id: str, db: Session = Depends(get_db)):
+    scan = db.query(Scan).filter(Scan.id == scan_id).first()
+    if not scan:
+        raise HTTPException(status_code=404, detail="Scan not found")
+    return db.query(Attack).filter(Attack.scan_id == scan_id).all()
