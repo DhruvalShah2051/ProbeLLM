@@ -74,7 +74,7 @@ async def run_pipeline(scan_id: str, api_key: str):
 
             db.add(attack_record)
             db.commit()
-            await asyncio.sleep(15)
+            # await asyncio.sleep(15)
 
         scan.status = ScanStatus.completed
         scan.completed_at = datetime.utcnow()
