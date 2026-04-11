@@ -119,9 +119,57 @@ def delete_scan(scan_id: str, db: Session = Depends(get_db)):
     db.delete(scan)
     db.commit()
 
+
 @router.get("/{scan_id}/attacks", response_model=List[AttackResponse])
 def get_attacks(scan_id: str, db: Session = Depends(get_db)):
     scan = db.query(Scan).filter(Scan.id == scan_id).first()
     if not scan:
         raise HTTPException(status_code=404, detail="Scan not found")
     return db.query(Attack).filter(Attack.scan_id == scan_id).all()
+
+
+@router.get("/{scan_id}/export")
+def export_scan(scan_id: str, db: Session = Depends(get_db)):
+    scan = db.query(Scan).filter(Scan.id == scan_id).first()
+    if not scan:
+        raise HTTPException(status_code=404, detail="Scan not found")
+    
+    attacks = db.query(Attack).filter(Attack.scan_id == scan_id).all()
+    
+    severity_counts = {"critical": 0, "high": 0, "medium": 0, "low": 0}
+    for attack in attacks:
+        if attack.severity in severity_counts:
+            severity_counts[attack.severity] += 1
+
+    return {
+        "scan": {
+            "id": scan.id,
+            "target_url": scan.target_url,
+            "model": scan.model,
+            "judge_model": scan.judge_model,
+            "categories": deserialize_categories(scan.categories),
+            "status": scan.status,
+            "created_at": scan.created_at,
+            "completed_at": scan.completed_at,
+        },
+        "summary": {
+            "total_attacks": len(attacks),
+            "vulnerable": len([a for a in attacks if a.success == "fail"]),
+            "safe": len([a for a in attacks if a.success == "pass"]),
+            "errors": len([a for a in attacks if a.success == "error"]),
+            "severity_counts": severity_counts,
+        },
+        "attacks": [
+            {
+                "template_id": a.template_id,
+                "category": a.category,
+                "severity": a.severity,
+                "success": a.success,
+                "score": a.score,
+                "payload": a.payload,
+                "response": a.response,
+                "judge_reasoning": a.judge_reasoning,
+            }
+            for a in attacks
+        ],
+    }

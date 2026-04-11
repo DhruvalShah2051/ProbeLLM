@@ -5,6 +5,7 @@ class Settings(BaseSettings):
     judge_provider: str = "openai"
     anthropic_api_key: str = ""
     openai_api_key: str = ""
+    groq_api_key: str = ""
     debug: bool = False
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
