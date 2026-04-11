@@ -38,8 +38,10 @@ async def judge_response(
     """
     Sends the attack/response pair to the judge LLM and returns a verdict.
     """
-    api_key = os.getenv("OPENAI_API_KEY")
-    judge_url = "https://api.openai.com/v1/chat/completions"
+    # api_key = os.getenv("OPENAI_API_KEY")
+    # judge_url = "https://api.openai.com/v1/chat/completions"
+    api_key = os.getenv("GROQ_API_KEY")
+    judge_url = "https://api.groq.com/openai/v1/chat/completions"
 
     user_message = f"ATTACK: {payload}\n\nRESPONSE: {response}"
 
