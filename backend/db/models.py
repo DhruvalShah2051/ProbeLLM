@@ -23,21 +23,25 @@ class Severity(str, enum.Enum):
 class Scan(Base):
     __tablename__ = "scans"
 
-    id              = Column(Integer, primary_key=True, index=True)
-    target_url      = Column(String, nullable=False)        # The LLM app being tested
-    target_name     = Column(String, nullable=False)        # Human-readable label
-    status          = Column(Enum(ScanStatus), default=ScanStatus.pending)
-    created_at      = Column(DateTime, default=datetime.utcnow)
-    completed_at    = Column(DateTime, nullable=True)
+    id           = Column(String, primary_key=True, index=True)  # change to String for uuid
+    target_url   = Column(String, nullable=False)
+    target_name  = Column(String, nullable=True)
+    model        = Column(String, nullable=False)
+    judge_model  = Column(String, default="gpt-4o")
+    categories   = Column(String, nullable=False)   # store as comma-separated string
+    status       = Column(Enum(ScanStatus), default=ScanStatus.pending)
+    created_at   = Column(DateTime, default=datetime.utcnow)
+    updated_at   = Column(DateTime, default=datetime.utcnow)
+    completed_at = Column(DateTime, nullable=True)
 
-    attacks         = relationship("Attack", back_populates="scan")
+    attacks      = relationship("Attack", back_populates="scan")
 
 
 class Attack(Base):
     __tablename__ = "attacks"
 
     id              = Column(Integer, primary_key=True, index=True)
-    scan_id         = Column(Integer, ForeignKey("scans.id"), nullable=False)
+    scan_id         = Column(String, ForeignKey("scans.id"), nullable=False)
     template_id     = Column(String, nullable=False)        # e.g. "prompt_injection/basic_override"
     category        = Column(String, nullable=False)        # e.g. "prompt_injection"
     payload         = Column(Text, nullable=False)          # The actual prompt sent
