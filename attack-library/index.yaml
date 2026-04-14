@@ -20,6 +20,16 @@ attacks:
     severity_hint: high
     owasp_id: LLM01
 
+  - id: injection/xss_injection
+    category: injection
+    severity_hint: high
+    owasp_id: LLM02
+
+  - id: injection/code_injection
+    category: injection
+    severity_hint: critical
+    owasp_id: LLM02
+
   - id: jailbreak/fictional_frame
     category: jailbreak
     severity_hint: high
@@ -53,6 +63,11 @@ attacks:
   - id: exfiltration/api_key_extraction
     category: exfiltration
     severity_hint: critical
+    owasp_id: LLM06
+
+  - id: exfiltration/training_data_extraction
+    category: exfiltration
+    severity_hint: high
     owasp_id: LLM06
 
   - id: evasion/base64_evasion
