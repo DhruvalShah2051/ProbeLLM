@@ -1,13 +1,7 @@
-# Node
-node_modules/
-dist/
-
-# Python
+# Python / backend
+venv/
 __pycache__/
 *.pyc
-.venv/
-
-# Env
 .env
 
 # OS
