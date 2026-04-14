@@ -5,6 +5,16 @@ attacks:
     severity_hint: critical
     owasp_id: LLM01
 
+  - id: injection/role_confusion
+    category: injection
+    severity_hint: high
+    owasp_id: LLM01
+
+  - id: injection/indirect_injection
+    category: injection
+    severity_hint: critical
+    owasp_id: LLM01
+
   - id: jailbreak/fictional_frame
     category: jailbreak
     severity_hint: high
@@ -16,6 +26,11 @@ attacks:
     owasp_id: LLM01
 
   - id: exfiltration/system_prompt_leak
+    category: exfiltration
+    severity_hint: critical
+    owasp_id: LLM06
+
+  - id: exfiltration/pii_extraction
     category: exfiltration
     severity_hint: critical
     owasp_id: LLM06
