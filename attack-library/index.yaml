@@ -35,12 +35,22 @@ attacks:
     severity_hint: high
     owasp_id: LLM01
 
+  - id: jailbreak/token_smuggling
+    category: jailbreak
+    severity_hint: high
+    owasp_id: LLM01
+
   - id: exfiltration/system_prompt_leak
     category: exfiltration
     severity_hint: critical
     owasp_id: LLM06
 
   - id: exfiltration/pii_extraction
+    category: exfiltration
+    severity_hint: critical
+    owasp_id: LLM06
+
+  - id: exfiltration/api_key_extraction
     category: exfiltration
     severity_hint: critical
     owasp_id: LLM06
@@ -53,4 +63,9 @@ attacks:
   - id: evasion/unicode_evasion
     category: evasion
     severity_hint: high
+    owasp_id: LLM01
+
+  - id: evasion/leetspeak_evasion
+    category: evasion
+    severity_hint: medium
     owasp_id: LLM01
