@@ -1,0 +1,26 @@
+version: "1.0"
+attacks:
+  - id: injection/basic_override
+    category: injection
+    severity_hint: critical
+    owasp_id: LLM01
+
+  - id: jailbreak/fictional_frame
+    category: jailbreak
+    severity_hint: high
+    owasp_id: LLM01
+
+  - id: jailbreak/authority_claim
+    category: jailbreak
+    severity_hint: high
+    owasp_id: LLM01
+
+  - id: exfiltration/system_prompt_leak
+    category: exfiltration
+    severity_hint: critical
+    owasp_id: LLM06
+
+  - id: evasion/base64_evasion
+    category: evasion
+    severity_hint: medium
+    owasp_id: LLM01
