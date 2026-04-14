@@ -15,12 +15,22 @@ attacks:
     severity_hint: critical
     owasp_id: LLM01
 
+  - id: injection/prompt_chaining
+    category: injection
+    severity_hint: high
+    owasp_id: LLM01
+
   - id: jailbreak/fictional_frame
     category: jailbreak
     severity_hint: high
     owasp_id: LLM01
 
   - id: jailbreak/authority_claim
+    category: jailbreak
+    severity_hint: high
+    owasp_id: LLM01
+
+  - id: jailbreak/many_shot
     category: jailbreak
     severity_hint: high
     owasp_id: LLM01
@@ -38,4 +48,9 @@ attacks:
   - id: evasion/base64_evasion
     category: evasion
     severity_hint: medium
+    owasp_id: LLM01
+
+  - id: evasion/unicode_evasion
+    category: evasion
+    severity_hint: high
     owasp_id: LLM01
