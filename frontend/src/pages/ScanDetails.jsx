@@ -1,5 +1,5 @@
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { scans, attacks } from "../services/mockData";
 
 function getStatusColor(status) {
   switch (status) {
@@ -18,24 +18,57 @@ function getStatusColor(status) {
 
 function ScanDetails() {
   const { id } = useParams();
-  const scanId = parseInt(id);
 
-  const scan = scans.find((s) => s.id === scanId);
-  const scanAttacks = attacks.filter((a) => a.scan_id === scanId);
+  const [scan, setScan] = useState(null);
+  const [attacks, setAttacks] = useState([]);
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Get scan details
+        const scanRes = await fetch(
+          `http://127.0.0.1:8000/api/scans/${id}`
+        );
+        const scanData = await scanRes.json();
+
+        // Get attacks for scan
+        const attackRes = await fetch(
+          `http://127.0.0.1:8000/api/scans/${id}/attacks`
+        );
+        const attackData = await attackRes.json();
+
+        setScan(scanData);
+        setAttacks(attackData);
+      } catch (err) {
+        console.error("Error fetching scan details:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [id]);
+
+  if (loading) return <p>Loading scan details...</p>;
   if (!scan) return <p>Scan not found!</p>;
 
   return (
     <div>
       <h2>{scan.target_name} - Scan Details</h2>
-      <p><strong>URL:</strong> {scan.target_url}</p>
-      <p><strong>Status:</strong> {scan.status}</p>
+      <p>
+        <strong>URL:</strong> {scan.target_url}
+      </p>
+      <p>
+        <strong>Status:</strong> {scan.status}
+      </p>
 
       <h3>Attacks</h3>
-      {scanAttacks.length === 0 ? (
+
+      {attacks.length === 0 ? (
         <p>No attacks yet.</p>
       ) : (
-        scanAttacks.map((attack) => (
+        attacks.map((attack) => (
           <div
             key={attack.id}
             style={{
@@ -45,9 +78,15 @@ function ScanDetails() {
               borderRadius: "6px",
             }}
           >
-            <p><strong>Template:</strong> {attack.template_id}</p>
-            <p><strong>Category:</strong> {attack.category}</p>
-            <p><strong>Payload:</strong> {attack.payload}</p>
+            <p>
+              <strong>Template:</strong> {attack.template_id}
+            </p>
+            <p>
+              <strong>Category:</strong> {attack.category}
+            </p>
+            <p>
+              <strong>Payload:</strong> {attack.payload}
+            </p>
             <p>
               <strong>Success:</strong>{" "}
               <span
@@ -58,11 +97,15 @@ function ScanDetails() {
                   borderRadius: "4px",
                 }}
               >
-                {attack.success}
+                {String(attack.success)}
               </span>
             </p>
-            <p><strong>Severity:</strong> {attack.severity}</p>
-            <p><strong>Response:</strong> {attack.response}</p>
+            <p>
+              <strong>Severity:</strong> {attack.severity}
+            </p>
+            <p>
+              <strong>Response:</strong> {attack.response}
+            </p>
           </div>
         ))
       )}
