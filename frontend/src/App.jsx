@@ -1,17 +1,21 @@
 import { Routes, Route } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import ScanDetails from "./pages/ScanDetails";
+import AttackDetail from "./pages/AttackDetail";
+import Navbar from "./components/Navbar";
 
 function App() {
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>ProbeLLM</h1>
-
-      <Routes>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/scan/:id" element={<ScanDetails />} />
-      </Routes>
-    </div>
+    <>
+      <Navbar />
+      <div style={{ padding: "20px" }}>
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/scan/:id" element={<ScanDetails />} />
+          <Route path="/scan/:id/attack/:attackId" element={<AttackDetail />} />
+        </Routes>
+      </div>
+    </>
   );
 }
 

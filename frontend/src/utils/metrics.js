@@ -13,8 +13,19 @@ export function calculateMetrics(attacks = []) {
 
   const totalAttacks = attacks.length;
 
-  const success = attacks.filter(a => a.success === true || a.success === "success").length;
-  const failed = attacks.filter(a => a.success === false || a.success === "fail").length;
+  const success = attacks.filter(
+    a =>
+      a.success === true ||
+      a.success === "success" ||
+      a.success === "pass"       // ✅ added: real API returns "pass"
+  ).length;
+
+  const failed = attacks.filter(
+    a =>
+      a.success === false ||
+      a.success === "fail" ||
+      a.success === "error"      // ✅ added: real API returns "error"
+  ).length;
 
   const successRate = ((success / totalAttacks) * 100).toFixed(2);
   const failureRate = ((failed / totalAttacks) * 100).toFixed(2);
