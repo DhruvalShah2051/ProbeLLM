@@ -1,5 +1,5 @@
-from db.database import engine
-from db.models import Base
+from db.database import engine, Base
+from db.models import User, Scan, AttackResult, AuditLog  # all four
 
 def init():
     Base.metadata.create_all(bind=engine)

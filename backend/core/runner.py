@@ -1,60 +1,52 @@
-import httpx
+"""
+Sends adversarial payloads to the target LLM.
+Supports any OpenAI-compatible API endpoint.
+"""
+import time
 from dataclasses import dataclass
-from typing import Optional
-from attacks.loader import get_attacks as get_attack_templates, AttackTemplate
+
+from openai import OpenAI
 
 
 @dataclass
-class AttackResult:
-    template_id: str
-    category: str
-    payload: str
-    severity: str
-    response: Optional[str]
-    error: Optional[str]
+class RunnerResult:
+    response_text: str
+    response_time_ms: int
+    error: str | None = None
 
 
-async def run_attack(
-    template: AttackTemplate,
+def run_attack(
     target_url: str,
-    model: str,
-    api_key: str,
-) -> AttackResult:
+    target_model: str,
+    payload: str,
+    api_key: str = "EMPTY",   # some local endpoints don't need a real key
+    timeout: int = 10,
+) -> RunnerResult:
     """
-    Sends a single attack payload to the target LLM endpoint.
-    Expects an OpenAI-compatible /chat/completions API.
+    Send a single adversarial payload to the target LLM.
+    Returns the raw response text and latency.
     """
-    headers = {
-        "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json",
-    }
-    body = {
-        "model": model,
-        "messages": [{"role": "user", "content": template.payload}],
-        "temperature": 0.0,
-        "max_tokens": 512,
-    }
+    # Strip trailing slash — OpenAI client adds its own paths
+    base_url = target_url.rstrip("/")
 
+    client = OpenAI(api_key=api_key, base_url=base_url)
+
+    start = time.monotonic()
     try:
-        async with httpx.AsyncClient(timeout=30.0) as client:
-            resp = await client.post(target_url, headers=headers, json=body)
-            resp.raise_for_status()
-            data = resp.json()
-            response_text = data["choices"][0]["message"]["content"]
-            return AttackResult(
-                template_id=template.id,
-                category=template.category,
-                payload=template.payload,
-                severity=template.severity,
-                response=response_text,
-                error=None,
-            )
+        completion = client.chat.completions.create(
+            model=target_model,
+            messages=[{"role": "user", "content": payload}],
+            timeout=timeout,
+            max_tokens=1024,
+        )
+        elapsed_ms = int((time.monotonic() - start) * 1000)
+        response_text = completion.choices[0].message.content or ""
+        return RunnerResult(response_text=response_text, response_time_ms=elapsed_ms)
+
     except Exception as e:
-        return AttackResult(
-            template_id=template.id,
-            category=template.category,
-            payload=template.payload,
-            severity=template.severity,
-            response=None,
+        elapsed_ms = int((time.monotonic() - start) * 1000)
+        return RunnerResult(
+            response_text="",
+            response_time_ms=elapsed_ms,
             error=str(e),
         )
