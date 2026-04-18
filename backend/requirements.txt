@@ -7,19 +7,28 @@ sqlalchemy==2.0.36
 psycopg2-binary==2.9.10
 alembic==1.14.0
 
+# Authentication
+bcrypt==4.0.1
+passlib==1.7.4
+python-jose[cryptography]==3.5.0
+
 # LLM clients
 anthropic==0.40.0
 openai==1.57.0
 
 # Config / env
+pydantic==2.12.5
 pydantic-settings==2.7.0
+pydantic[email]==2.12.5
 python-dotenv==1.0.1
 
 # HTTP client (for hitting the target LLM)
 httpx==0.28.0
+certifi==2026.2.25
 
 # YAML (for attack library)
 pyyaml==6.0.2
 
 # Export
 reportlab==4.2.5
+pillow==12.2.0
