@@ -1,21 +1,34 @@
 import { Routes, Route } from "react-router-dom";
+import ProtectedRoute from "./components/ProtectedRoute";
+
+import Landing from "./pages/Landing";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
-import ScanDetails from "./pages/ScanDetails";
-import AttackDetail from "./pages/AttackDetail";
-import Navbar from "./components/Navbar";
+import NewScan from "./pages/NewScan";
+import LiveScan from "./pages/LiveScan";
+import Report from "./pages/Report";
 
 function App() {
   return (
-    <>
-      <Navbar />
-      <div style={{ padding: "20px" }}>
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/scan/:id" element={<ScanDetails />} />
-          <Route path="/scan/:id/attack/:attackId" element={<AttackDetail />} />
-        </Routes>
-      </div>
-    </>
+    <Routes>
+      <Route path="/" element={<Landing />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
+
+      <Route path="/dashboard" element={
+        <ProtectedRoute><Dashboard /></ProtectedRoute>
+      } />
+      <Route path="/scans/new" element={
+        <ProtectedRoute><NewScan /></ProtectedRoute>
+      } />
+      <Route path="/scans/:id/live" element={
+        <ProtectedRoute><LiveScan /></ProtectedRoute>
+      } />
+      <Route path="/scans/:id/report" element={
+        <ProtectedRoute><Report /></ProtectedRoute>
+      } />
+    </Routes>
   );
 }
 
