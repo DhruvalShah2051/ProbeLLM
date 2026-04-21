@@ -1,156 +1,50 @@
-# ProbeLLM — LLM Red Teaming Platform
+# ⚡ ProbeLLM — LLM Red Teaming Platform
 
-A platform for systematically testing and evaluating LLM vulnerabilities using adversarial attack templates, an automated runner, and a judge LLM that scores each response.
+ProbeLLM is a security testing platform that automatically probes LLM applications for vulnerabilities. Point it at any OpenAI-compatible endpoint, choose your attack categories, and watch it fire adversarial prompts in real time — each response judged by a second LLM for severity.
+
+>  **[Homepage walkthrough (20s)](https://youtu.be/ama6vFjxlzg)**<br>
+>  **[Full scan demo (2 min)](https://youtu.be/mGmukQh7oBw)**
+
+---
+
+## What it does
+
+1. **Authenticate** — sign up, log in, get a JWT token
+2. **Configure a scan** — target URL, model, API key, judge LLM, attack categories
+3. **Watch it run live** — WebSocket feed shows each attack as it fires, with real-time pass/fail/vulnerable verdicts
+4. **Review the report** — per-attack breakdown with payloads, model responses, judge reasoning, and severity scores
+
+
+
+---
+
+## Key engineering decisions
+
+- **Real-time WebSocket updates** — the frontend receives per-attack events as they happen, with automatic polling fallback if the WebSocket drops
+- **Judge LLM scoring** — every target response is evaluated by a configurable second LLM (Groq, OpenAI, or Anthropic) using attack-specific guidance from the YAML template
+- **Any OpenAI-compatible target** — the attack runner works against any endpoint that follows the OpenAI chat completions spec, not just OpenAI itself
+- **User-scoped data** — JWT auth ensures users only see their own scans; all scan endpoints filter by the authenticated user
+- **YAML-driven attack library** — attack templates are fully declarative, with payloads, success indicators, and judge guidance defined per-template
 
 ---
 
 ## Architecture
 
-```
-Frontend (React)         Backend (FastAPI)          External
-─────────────────        ──────────────────         ────────
-Landing page       →     Auth (JWT)            →    Target LLM (any OpenAI-compatible)
-Login / Signup     →     Scan orchestrator     →    Judge LLM (Groq / OpenAI / Anthropic)
-Dashboard          →     Attack runner         →    Attack library (YAML templates)
-Live scan view     ←     WebSocket updates          
-Report view        →     Results DB (Postgres)
-```
+![Architecture](Architecture.png)
 
 ---
 
-## Prerequisites
+## Tech Stack
 
-- Python 3.11+
-- PostgreSQL (via pgAdmin or local install)
-- Node.js 18+ (for frontend)
-- A Groq API key (free at console.groq.com) — or OpenAI / Anthropic key
-
----
-
-## Backend Setup
-
-**1. Clone the repo**
-```bash
-git clone <repo-url>
-cd ProbeLLM/backend
-```
-
-**2. Create and activate virtual environment**
-```cmd
-python -m venv .venv
-.venv\Scripts\activate
-```
-
-**3. Install dependencies**
-```cmd
-pip install -r requirements.txt
-```
-
-**4. Configure environment variables**
-```cmd
-copy .env.example .env
-```
-
-Open `.env` and fill in:
-```
-DATABASE_URL=postgresql://postgres:yourpassword@localhost:5432/redteam
-GROQ_API_KEY=your-groq-key-here
-SECRET_KEY=any-long-random-string
-```
-
-**5. Create the database**
-
-Open pgAdmin, create a database called `redteam`, then run:
-```cmd
-python -m db.init_db
-```
-
-You should see: `Tables created successfully.`
-
-**6. Start the server**
-```cmd
-uvicorn main:app --reload
-```
-
-Server runs at `http://localhost:8000`.  
-Interactive API docs at `http://localhost:8000/docs`.
-
----
-
-## Frontend Setup
-
-```bash
-cd ProbeLLM/frontend
-npm install
-npm run dev
-```
-
-Frontend runs at `http://localhost:5173`.
-
----
-
-## API Endpoints
-
-### Auth
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| `POST` | `/api/auth/signup` | No | Create account |
-| `POST` | `/api/auth/login` | No | Login, receive JWT token |
-| `POST` | `/api/auth/logout` | Yes | Logout |
-| `GET` | `/api/auth/me` | Yes | Get current user profile |
-
-### Scans
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| `POST` | `/api/scans/` | Yes | Create and launch a new scan |
-| `GET` | `/api/scans/` | Yes | List all scans for current user |
-| `GET` | `/api/scans/{id}` | Yes | Get a single scan |
-| `DELETE` | `/api/scans/{id}` | Yes | Delete a scan |
-| `GET` | `/api/scans/{id}/attacks` | Yes | Get all attack results for a scan |
-| `GET` | `/api/scans/{id}/export` | Yes | Export full scan report as JSON |
-
-### WebSocket
-| | Endpoint | Description |
-|-|----------|-------------|
-| `WS` | `/ws/scans/{id}?token=<jwt>` | Live attack updates during a scan |
-
-### Other
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/health` | Health check |
-
----
-
-### Example: Create a scan
-
-```json
-POST /api/scans/
-Authorization: Bearer <token>
-
-{
-  "target_url": "https://api.groq.com/openai/v1",
-  "target_model": "llama-3.1-8b-instant",
-  "target_api_key": "your-target-api-key",
-  "judge_provider": "groq",
-  "judge_model": "llama-3.1-8b-instant",
-  "attack_categories": ["injection", "jailbreak", "exfiltration", "evasion"]
-}
-```
-
----
-
-## How It Works
-
-1. User signs up / logs in and receives a JWT token
-2. A scan is created via `POST /api/scans/` — returns immediately with `status: queued`
-3. The pipeline runs in the background:
-   - Loads YAML attack templates for the selected categories
-   - Fires each payload at the target LLM
-   - Sends each response to the judge LLM for scoring
-   - Writes all results to Postgres
-   - Broadcasts live updates over WebSocket
-4. Scan status transitions: `queued → running → completed`
-5. Results available via `/api/scans/{id}/attacks` and `/api/scans/{id}/export`
+| Layer | Technology |
+|-------|-----------|
+| Frontend | React, Vite, React Router |
+| Backend | Python, FastAPI, SQLAlchemy |
+| Database | PostgreSQL |
+| Auth | JWT (python-jose), bcrypt |
+| Real-time | WebSockets |
+| LLM providers | Groq, OpenAI, Anthropic |
+| Attack library | YAML templates |
 
 ---
 
@@ -158,28 +52,100 @@ Authorization: Bearer <token>
 
 | Category | Description |
 |----------|-------------|
-| `evasion` | Encoded payloads and obfuscation techniques |
-| `exfiltration` | System prompt leakage and data extraction |
-| `injection` | Prompt injection and instruction override attacks |
+| `injection` | Prompt injection and instruction override |
 | `jailbreak` | Attempts to bypass safety guidelines |
+| `exfiltration` | System prompt leakage and data extraction |
+| `evasion` | Encoded payloads that bypass keyword filters |
 
 ---
 
-## Judge Providers
+## API Overview
 
-| Provider | Notes |
-|----------|-------|
-| `groq` | Free tier available — recommended for development |
-| `openai` | Requires paid API key |
-| `anthropic` | Requires paid API key |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/auth/signup` | Create account |
+| `POST` | `/api/auth/login` | Login, receive JWT |
+| `POST` | `/api/scans/` | Launch a new scan |
+| `GET` | `/api/scans/` | List user's scans |
+| `GET` | `/api/scans/{id}/attacks` | Per-attack results |
+| `GET` | `/api/scans/{id}/export` | Full JSON report |
+| `WS` | `/ws/scans/{id}?token=` | Live scan updates |
+
+Full interactive API docs available at `http://localhost:8000/docs` when running locally.
 
 ---
 
-## Tech Stack
+## Running locally
 
-- **Backend:** Python, FastAPI, SQLAlchemy, PostgreSQL
-- **Frontend:** React, Vite
-- **Auth:** JWT via python-jose
-- **LLM providers:** Groq, OpenAI, Anthropic
-- **Attack library:** YAML templates
-- **Real-time:** WebSockets
+<details>
+<summary><strong>Backend setup</strong></summary>
+
+**Requirements:** Python 3.11+, PostgreSQL
+
+```cmd
+cd backend
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+Create a database called `redteam` in pgAdmin, then:
+
+```cmd
+copy .env.example .env
+```
+
+Fill in `.env`:
+```
+DATABASE_URL=postgresql://postgres:yourpassword@localhost:5432/redteam
+GROQ_API_KEY=your-groq-key
+SECRET_KEY=any-long-random-string
+```
+
+```cmd
+python -m db.init_db
+uvicorn main:app --reload
+```
+
+Backend runs at `http://localhost:8000`.
+
+</details>
+
+<details>
+<summary><strong>Frontend setup</strong></summary>
+
+**Requirements:** Node.js 18+
+
+```bash
+cd frontend
+npm install
+cp .env.example .env
+npm run dev
+```
+
+Frontend runs at `http://localhost:5173`.
+
+</details>
+
+---
+
+## Project structure
+
+```
+ProbeLLM/
+├── backend/
+│   ├── api/routes/       # auth.py, scans.py, ws.py
+│   ├── core/             # auth.py, pipeline.py, judge.py, runner.py, loader.py
+│   ├── db/               # models.py, schemas.py, database.py
+│   └── main.py
+├── frontend/
+│   └── src/
+│       ├── pages/        # Landing, Login, Signup, Dashboard, NewScan, LiveScan, Report
+│       ├── components/   # ProtectedRoute
+│       └── services/     # api.js
+└── attack-library/
+    ├── injection/
+    ├── jailbreak/
+    ├── exfiltration/
+    └── evasion/
+```
