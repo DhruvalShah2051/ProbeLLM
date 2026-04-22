@@ -7,7 +7,7 @@ import "../styles/NewScan.css";
 const JUDGE_MODELS = {
   groq: ["llama-3.1-8b-instant", "llama-3.3-70b-versatile", "mixtral-8x7b-32768"],
   openai: ["gpt-4o", "gpt-4o-mini", "gpt-4-turbo"],
-  anthropic: ["claude-opus-4-6", "claude-sonnet-4-6", "claude-haiku-4-5"],
+  anthropic: ["claude-opus-4-6", "claude-sonnet-4-6", "claude-haiku-4-5-20251001"],
 };
 
 const ATTACK_CATEGORIES = ["injection", "jailbreak", "exfiltration", "evasion"];
