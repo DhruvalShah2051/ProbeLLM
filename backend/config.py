@@ -8,9 +8,9 @@ class Settings(BaseSettings):
     openai_api_key: str = ""
     groq_api_key: str = ""
     debug: bool = False
-    secret_key: str = "change-this-in-production"        # add this
-    access_token_expire_minutes: int = 60                 # add this
-
+    secret_key: str = "change-this-in-production"
+    access_token_expire_minutes: int = 60
+    
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
 settings = Settings()
