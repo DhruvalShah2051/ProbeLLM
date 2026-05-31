@@ -15,7 +15,7 @@ class AttackTemplate:
     owasp_id: Optional[str] = None
 
 
-LIBRARY_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "attack-library")
+LIBRARY_PATH = os.path.join(os.path.dirname(__file__), "..", "attack-library")
 
 
 def _load_attack_file(attack_id: str) -> dict:
