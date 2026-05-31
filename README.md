@@ -1,4 +1,4 @@
-# ⚡ ProbeLLM — LLM Red Teaming Platform
+#  ProbeLLM — LLM Red Teaming Platform
 
 ProbeLLM is a security testing platform that automatically probes LLM applications for vulnerabilities. Point it at any OpenAI-compatible endpoint, choose your attack categories, and watch it fire adversarial prompts in real time — each response judged by a second LLM for severity.
 
