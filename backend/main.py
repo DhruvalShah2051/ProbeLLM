@@ -6,6 +6,8 @@ from dotenv import load_dotenv
 import os
 from db.database import engine, Base
 import db.models
+import sys
+print("[main] starting up...", file=sys.stderr, flush=True)
 
 load_dotenv()
 
