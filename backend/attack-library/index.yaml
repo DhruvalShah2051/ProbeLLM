@@ -1,0 +1,86 @@
+version: "1.0"
+attacks:
+  - id: injection/basic_override
+    category: injection
+    severity_hint: critical
+    owasp_id: LLM01
+
+  - id: injection/role_confusion
+    category: injection
+    severity_hint: high
+    owasp_id: LLM01
+
+  - id: injection/indirect_injection
+    category: injection
+    severity_hint: critical
+    owasp_id: LLM01
+
+  - id: injection/prompt_chaining
+    category: injection
+    severity_hint: high
+    owasp_id: LLM01
+
+  - id: injection/xss_injection
+    category: injection
+    severity_hint: high
+    owasp_id: LLM02
+
+  - id: injection/code_injection
+    category: injection
+    severity_hint: critical
+    owasp_id: LLM02
+
+  - id: jailbreak/fictional_frame
+    category: jailbreak
+    severity_hint: high
+    owasp_id: LLM01
+
+  - id: jailbreak/authority_claim
+    category: jailbreak
+    severity_hint: high
+    owasp_id: LLM01
+
+  - id: jailbreak/many_shot
+    category: jailbreak
+    severity_hint: high
+    owasp_id: LLM01
+
+  - id: jailbreak/token_smuggling
+    category: jailbreak
+    severity_hint: high
+    owasp_id: LLM01
+
+  - id: exfiltration/system_prompt_leak
+    category: exfiltration
+    severity_hint: critical
+    owasp_id: LLM06
+
+  - id: exfiltration/pii_extraction
+    category: exfiltration
+    severity_hint: critical
+    owasp_id: LLM06
+
+  - id: exfiltration/api_key_extraction
+    category: exfiltration
+    severity_hint: critical
+    owasp_id: LLM06
+
+  - id: exfiltration/training_data_extraction
+    category: exfiltration
+    severity_hint: high
+    owasp_id: LLM06
+
+  - id: evasion/base64_evasion
+    category: evasion
+    severity_hint: medium
+    owasp_id: LLM01
+
+  - id: evasion/unicode_evasion
+    category: evasion
+    severity_hint: high
+    owasp_id: LLM01
+
+  - id: evasion/leetspeak_evasion
+    category: evasion
+    severity_hint: medium
+    owasp_id: LLM01
