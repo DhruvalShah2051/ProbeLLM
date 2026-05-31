@@ -2,6 +2,8 @@
 
 ProbeLLM is a security testing platform that automatically probes LLM applications for vulnerabilities. Point it at any OpenAI-compatible endpoint, choose your attack categories, and watch it fire adversarial prompts in real time — each response judged by a second LLM for severity.
 
+>  **[ProbeLLM](https://probe-llm.vercel.app)**
+
 >  **[Homepage walkthrough (20s)](https://youtu.be/ama6vFjxlzg)**<br>
 >  **[Full scan demo (2 min)](https://youtu.be/mGmukQh7oBw)**
 
