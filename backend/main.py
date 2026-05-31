@@ -4,10 +4,14 @@ from fastapi.security import HTTPBearer
 from api.routes import scans, auth, ws
 from dotenv import load_dotenv
 import os
+from db.database import engine, Base
+import db.models
 
 load_dotenv()
 
 security = HTTPBearer()
+
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="LLM Red Teaming Platform", version="0.1.0")
 
