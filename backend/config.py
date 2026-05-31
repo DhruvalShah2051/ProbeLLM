@@ -1,9 +1,10 @@
+import os
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     database_url: str
     allowed_origins: str = "http://localhost:5173"
-    attack_library_path: str = "attack-library"
+    attack_library_path: str = os.path.join(os.path.dirname(__file__), "attack-library")
     anthropic_api_key: str = ""
     openai_api_key: str = ""
     groq_api_key: str = ""
