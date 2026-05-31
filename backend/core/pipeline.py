@@ -64,23 +64,15 @@ def run_pipeline(scan_id: int):
             return
         print(f"[pipeline] Starting scan {scan_id}, target={scan.target_url}, categories={scan.attack_categories}")
 
-        print(f"[pipeline] Loading templates from: {settings.attack_library_path}", flush=True)
-        try:
-            templates = load_templates(settings.attack_library_path, selected_categories)
-            print(f"[pipeline] Loaded {len(templates)} templates", flush=True)
-        except Exception as e:
-            print(f"[pipeline] ERROR loading templates: {e}", flush=True)
-            import traceback
-            traceback.print_exc()
-            _mark_scan_failed(scan, db, str(e))
-            return
-
         # ── 1. Load attack templates ────────────────────────────────────────
         from db.models import AttackCategory
         selected_categories = [AttackCategory(c) for c in scan.attack_categories]
 
+        print(f"[pipeline] Loading templates from: {settings.attack_library_path}", flush=True)
+
         try:
             templates = load_templates(settings.attack_library_path, selected_categories)
+            print(f"[pipeline] Loaded {len(templates)} templates", flush=True)
         except FileNotFoundError as e:
             _mark_scan_failed(scan, db, str(e))
             return
