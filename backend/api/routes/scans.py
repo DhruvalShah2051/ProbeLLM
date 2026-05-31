@@ -3,7 +3,6 @@ from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from typing import List, Optional
 from datetime import datetime
-import sys
 
 from db.database import get_db
 from db.models import JudgeProvider, Scan, AttackResult, ScanStatus, AttackCategory, AttackStatus, Severity, User
@@ -14,11 +13,9 @@ router = APIRouter()
 
 try:
     from core.pipeline import run_pipeline
-    print("[scans] pipeline imported successfully", flush=True)
 except Exception as e:
     import traceback
-    print(f"[scans] FAILED to import pipeline: {e}")
-    traceback.print_exc(file=sys.stderr)
+    traceback.print_exc()
     run_pipeline = None
 
 
