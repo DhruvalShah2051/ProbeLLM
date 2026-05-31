@@ -11,6 +11,15 @@ from core.auth import get_current_user
 
 router = APIRouter()
 
+try:
+    from core.pipeline import run_pipeline
+    print("[scans] pipeline imported successfully")
+except Exception as e:
+    import traceback
+    print(f"[scans] FAILED to import pipeline: {e}")
+    traceback.print_exc()
+    run_pipeline = None
+
 
 # ---------------------------------------------------------------------------
 # Request / Response schemas
@@ -94,8 +103,8 @@ async def create_scan(
     db.commit()
     db.refresh(scan)
 
-    # Pipeline hook — uncomment when run_pipeline is ready
-    from core.pipeline import run_pipeline
+    if run_pipeline is None:
+        raise HTTPException(status_code=500, detail="Pipeline unavailable")
     background_tasks.add_task(run_pipeline, scan.id)
 
     return scan
